@@ -1,3 +1,6 @@
 {
-    "dart.flutterSdkPath": "/opt/homebrew/share/flutter"
+   "dart.flutterSdkPath": "/Users/adrianalpuche/Development/flutter",
+   "cSpell.words": [
+      "Gamedetails"
+   ]
 }
