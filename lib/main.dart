@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:game_library/config/Theme/Colors.dart';
 import 'package:game_library/presentation/screens/form/create_screen.dart';
 import 'package:game_library/presentation/screens/home/home_screen.dart';
@@ -16,12 +17,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+ 
+
   int actualScreen = 0;
 
   final List<Widget> _screens = [HomeScreen(), CreateScreen()];
 
   @override
   Widget build(BuildContext context) {
+
+      SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => GamesProvider())],
       child: MaterialApp(
@@ -29,10 +39,12 @@ class _MyAppState extends State<MyApp> {
         title: 'Library Game',
         themeMode: ThemeMode.system,
         theme: ThemeData(
+          useMaterial3: true,
           brightness: Brightness.light,
           scaffoldBackgroundColor: AppColors.light.bg,
         ),
         darkTheme: ThemeData(
+            useMaterial3: true,
           brightness: Brightness.dark,
           scaffoldBackgroundColor: AppColors.dark.bg,
         ),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:game_library/config/Theme/Colors.dart';
 import 'package:game_library/models/games.dart';
 import 'package:game_library/presentation/screens/form/update_screen.dart';
-import 'package:game_library/presentation/screens/home/home_screen.dart';
 import 'package:game_library/provider/games_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -59,6 +58,9 @@ class _GameDetailsCard extends StatelessWidget {
   }
 
   Widget _BackButton(BuildContext context) {
+      final colors = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.dark
+        : AppColors.light;
     return InkWell(
       borderRadius: BorderRadius.circular(25),
       onTap: () {
@@ -79,10 +81,10 @@ class _GameDetailsCard extends StatelessWidget {
                 width: 0.5,
               ),
             ),
-            child: const Icon(
+            child:  Icon(
               Icons.arrow_back_ios_new,
               size: 18,
-              color: Colors.white,
+              color: colors.accentLight,
             ),
           ),
         ),
@@ -359,7 +361,7 @@ class _ButtonDelete extends StatelessWidget {
   const _ButtonDelete({required this.id});
   @override
   Widget build(BuildContext context) {
-    final deleteGame = context.watch<GamesProvider>().fetchDelateGame;
+    final deleteGame = context.watch<GamesProvider>().deleteGame;
     final colors = Theme.of(context).brightness == Brightness.dark
         ? AppColors.dark
         : AppColors.light;
@@ -380,10 +382,7 @@ class _ButtonDelete extends StatelessWidget {
           onTap: () {
             deleteGame(id);
             Future.delayed(const Duration(milliseconds: 120), () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => HomeScreen()),
-              );
+              Navigator.pop(context);
             });
           },
           child: const Center(

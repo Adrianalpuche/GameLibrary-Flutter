@@ -13,7 +13,6 @@ class UpdateScreen extends StatefulWidget {
 }
 
 class _UpdateScreenState extends State<UpdateScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -24,23 +23,32 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
+      final colors = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.dark
+        : AppColors.light;
+
     final game = context.watch<GamesProvider>().gameDetails[widget.id];
 
     if (game == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Actualizar Juego'),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon:  Icon(
+            Icons.arrow_back_ios,
+            color: colors.accentLight,
+            ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: UpdateForm(game: game),
-        ),
+        title: const Text('Actualizar Juego'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: UpdateForm(game: game),
       ),
     );
   }
@@ -65,13 +73,14 @@ class _UpdateFormState extends State<UpdateForm> {
   late Developer developerId;
   late DateTime releaseDate;
 
-
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.game.title);
     _imageUrlController = TextEditingController(text: widget.game.imageUrl);
-    _descriptionController = TextEditingController(text: widget.game.description);
+    _descriptionController = TextEditingController(
+      text: widget.game.description,
+    );
     genreId = widget.game.genre;
     developerId = widget.game.developer;
     releaseDate = widget.game.releaseDate;
@@ -87,12 +96,18 @@ class _UpdateFormState extends State<UpdateForm> {
 
   List<Genre> _uniqueGenres(List<Games> games) {
     final seen = <int>{};
-    return games.map((g) => g.genre).where((genre) => seen.add(genre.id)).toList();
+    return games
+        .map((g) => g.genre)
+        .where((genre) => seen.add(genre.id))
+        .toList();
   }
 
   List<Developer> _uniqueDevelopers(List<Games> games) {
     final seen = <int>{};
-    return games.map((g) => g.developer).where((dev) => seen.add(dev.id)).toList();
+    return games
+        .map((g) => g.developer)
+        .where((dev) => seen.add(dev.id))
+        .toList();
   }
 
   Future<void> _submitForm() async {
@@ -100,14 +115,14 @@ class _UpdateFormState extends State<UpdateForm> {
 
     try {
       await context.read<GamesProvider>().putGame(
-            widget.game.id,
-            _titleController.text,
-            _imageUrlController.text,
-            _descriptionController.text,
-            genreId.id,
-            developerId.id,
-            releaseDate,
-          );
+        widget.game.id,
+        _titleController.text,
+        _imageUrlController.text,
+        _descriptionController.text,
+        genreId.id,
+        developerId.id,
+        releaseDate,
+      );
 
       if (!mounted) return;
 
@@ -117,9 +132,9 @@ class _UpdateFormState extends State<UpdateForm> {
 
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -152,25 +167,23 @@ class _UpdateFormState extends State<UpdateForm> {
     InputDecoration fieldDecoration({
       required String hintText,
       required Widget prefixIcon,
-    }) =>
-        InputDecoration(
-          hintText: hintText,
-          prefixIcon: prefixIcon,
-          filled: true,
-          fillColor: colors.surface,
-          border: _border(colors.border),
-          enabledBorder: _border(colors.border),
-          focusedBorder: _border(colors.accent, width: 2),
-          errorBorder: _border(Colors.red),
-          focusedErrorBorder: _border(Colors.red, width: 2),
-        );
+    }) => InputDecoration(
+      hintText: hintText,
+      prefixIcon: prefixIcon,
+      filled: true,
+      fillColor: colors.surface,
+      border: _border(colors.border),
+      enabledBorder: _border(colors.border),
+      focusedBorder: _border(colors.accent, width: 2),
+      errorBorder: _border(Colors.red),
+      focusedErrorBorder: _border(Colors.red, width: 2),
+    );
 
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
           _FieldLabel(text: 'Título'),
           const SizedBox(height: 6),
           TextFormField(
@@ -181,7 +194,8 @@ class _UpdateFormState extends State<UpdateForm> {
               prefixIcon: Icon(Icons.title, color: colors.accent),
             ),
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'El título es requerido';
+              if (v == null || v.trim().isEmpty)
+                return 'El título es requerido';
               if (v.trim().length < 2) return 'Mínimo 2 caracteres';
               return null;
             },
@@ -201,7 +215,8 @@ class _UpdateFormState extends State<UpdateForm> {
               prefixIcon: Icon(Icons.link, color: colors.accent),
             ),
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'La URL de imagen es requerida';
+              if (v == null || v.trim().isEmpty)
+                return 'La URL de imagen es requerida';
               final uri = Uri.tryParse(v.trim());
               if (uri == null || !(uri.hasScheme && uri.hasAuthority)) {
                 return 'Ingresa una URL válida';
@@ -225,7 +240,8 @@ class _UpdateFormState extends State<UpdateForm> {
               ),
             ),
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'La descripción es requerida';
+              if (v == null || v.trim().isEmpty)
+                return 'La descripción es requerida';
               if (v.trim().length < 10) return 'Mínimo 10 caracteres';
               return null;
             },
@@ -246,7 +262,9 @@ class _UpdateFormState extends State<UpdateForm> {
             style: TextStyle(color: colors.text),
             icon: Icon(Icons.keyboard_arrow_down, color: colors.accent),
             items: genres
-                .map((g) => DropdownMenuItem<Genre>(value: g, child: Text(g.name)))
+                .map(
+                  (g) => DropdownMenuItem<Genre>(value: g, child: Text(g.name)),
+                )
                 .toList(),
             onChanged: (v) {
               if (v != null) setState(() => genreId = v);
@@ -269,7 +287,12 @@ class _UpdateFormState extends State<UpdateForm> {
             style: TextStyle(color: colors.text),
             icon: Icon(Icons.keyboard_arrow_down, color: colors.accent),
             items: developers
-                .map((d) => DropdownMenuItem<Developer>(value: d, child: Text(d.name)))
+                .map(
+                  (d) => DropdownMenuItem<Developer>(
+                    value: d,
+                    child: Text(d.name),
+                  ),
+                )
                 .toList(),
             onChanged: (v) {
               if (v != null) setState(() => developerId = v);
@@ -280,7 +303,10 @@ class _UpdateFormState extends State<UpdateForm> {
           ),
           const SizedBox(height: 24),
 
-          _SectionHeader(icon: Icons.calendar_today_outlined, label: 'Lanzamiento'),
+          _SectionHeader(
+            icon: Icons.calendar_today_outlined,
+            label: 'Lanzamiento',
+          ),
           const SizedBox(height: 14),
           _FieldLabel(text: 'Fecha de lanzamiento'),
           const SizedBox(height: 6),
@@ -304,7 +330,11 @@ class _UpdateFormState extends State<UpdateForm> {
                     style: TextStyle(color: colors.text, fontSize: 16),
                   ),
                   const Spacer(),
-                  Icon(Icons.edit_calendar_outlined, color: colors.label, size: 18),
+                  Icon(
+                    Icons.edit_calendar_outlined,
+                    color: colors.label,
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -333,7 +363,6 @@ class _UpdateFormState extends State<UpdateForm> {
     );
   }
 }
-
 
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
